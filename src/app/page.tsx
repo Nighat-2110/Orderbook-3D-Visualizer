@@ -1,103 +1,135 @@
-import Image from "next/image";
+'use client';
+
+import { useRef, useState, useEffect } from 'react';
+import ThreeBarGraph, { ThreeBarGraphRef } from '@/components/ThreeBarGraph';
+import ControlPanel from '@/components/ControlPanel';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const graphRef = useRef<ThreeBarGraphRef>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [venue, setVenue] = useState<'binance' | 'coinbase'>('binance');
+  const [thresholdMultiplier, setThresholdMultiplier] = useState<number>(2);
+  const [numberOfLevels, setNumberOfLevels] = useState<number>(20);
+  const [refreshRate, setRefreshRate] = useState<number>(500);
+  const [showBids, setShowBids] = useState<boolean>(true);
+  const [showAsks, setShowAsks] = useState<boolean>(true);
+  const [showTooltip, setShowTooltip] = useState<boolean>(true);
+  const [viewAngle, setViewAngle] = useState<'top' | 'side' | 'diagonal'>('diagonal');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [highlightZones, setHighlightZones] = useState<boolean>(true);
+  const [showVolumeProfile, setShowVolumeProfile] = useState<boolean>(true);
+  const [fullscreen, setFullscreen] = useState<boolean>(false);
+
+  // Handle exiting fullscreen on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreen(false);
+    };
+
+    if (fullscreen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'auto';
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'auto';
+    };
+  }, [fullscreen]);
+
+  // PNG snapshot export
+  const handleSnapshot = () => {
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `snapshot-${venue}-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } else {
+      alert('Snapshot failed: Canvas not found.');
+    }
+  };
+
+  // GLTF export
+  const handleGLTFExport = () => {
+    if (graphRef.current) {
+      graphRef.current.exportGLTF();
+    } else {
+      alert('3D Graph not ready for export.');
+    }
+  };
+
+  return (
+    <div
+      className={`min-h-screen p-4 ${
+        theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'
+      } flex flex-col md:flex-row gap-6`}
+    >
+      {!fullscreen && (
+        <div className="w-full md:w-1/4">
+          <ControlPanel
+            venue={venue}
+            setVenue={setVenue}
+            thresholdMultiplier={thresholdMultiplier}
+            setThresholdMultiplier={setThresholdMultiplier}
+            numberOfLevels={numberOfLevels}
+            setNumberOfLevels={setNumberOfLevels}
+            refreshRate={refreshRate}
+            setRefreshRate={setRefreshRate}
+            showBids={showBids}
+            setShowBids={setShowBids}
+            showAsks={showAsks}
+            setShowAsks={setShowAsks}
+            showTooltip={showTooltip}
+            setShowTooltip={setShowTooltip}
+            viewAngle={viewAngle}
+            setViewAngle={setViewAngle}
+            theme={theme}
+            setTheme={setTheme}
+            fullscreen={fullscreen}
+            setFullscreen={setFullscreen}
+            showVolumeProfile={showVolumeProfile}
+            setShowVolumeProfile={setShowVolumeProfile}
+            highlightZones={highlightZones}
+            setHighlightZones={setHighlightZones}
+            onSnapshot={handleSnapshot}
+            onExportGLTF={handleGLTFExport}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      <div
+        className={`w-full md:w-3/4 h-[500px] relative ${
+          fullscreen ? 'fixed inset-0 z-50 bg-black p-2' : ''
+        }`}
+      >
+        <ThreeBarGraph
+          ref={graphRef}
+          venue={venue}
+          thresholdMultiplier={thresholdMultiplier}
+          numberOfLevels={numberOfLevels}
+          refreshRate={refreshRate}
+          showBids={showBids}
+          showAsks={showAsks}
+          showTooltip={showTooltip}
+          viewAngle={viewAngle}
+          theme={theme}
+          highlightZones={highlightZones}
+          showVolumeProfile={showVolumeProfile}
+        />
+
+        {fullscreen && (
+          <button
+            onClick={() => setFullscreen(false)}
+            className="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded shadow hover:bg-gray-200"
+          >
+            Exit Fullscreen (Esc)
+          </button>
+        )}
+      </div>
     </div>
   );
 }
