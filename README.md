@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📈 Orderbook Depth 3D Visualizer
 
-## Getting Started
+A real-time, interactive 3D web application for visualizing orderbook depth across cryptocurrency trading venues. Built with React Three Fiber and TypeScript, this project helps traders, analysts, and developers analyze bid/ask volumes, pressure zones, volume profiles, and price imbalance.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📌 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- ✅ **Real-Time Orderbook Visualization**
+- ✅ **Interactive 3D Graph using Three.js**
+- ✅ **Venue Filtering (Binance, OKX, Bybit, etc.)**
+- ✅ **Pressure Zone Detection and Highlighting**
+- ✅ **Volume Profile and Depth Chart**
+- ✅ **Midprice Line & Volume Imbalance**
+- ✅ **User-Tunable Controls for Thresholds, Depth, View Angle**
+- ✅ **Unit Testing for Algorithms and Core Components**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧠 Assumptions
 
-## Learn More
+- Orderbook data is simulated or fetched in JSON format with price and volume for bid and ask sides.
+- Volume thresholds for pressure zones are calculated based on a configurable multiplier of the average volume in the current depth window.
+- Z-axis in 3D graph is used as a pseudo-time indicator for animation flow.
+- Venue names are standardized and match the simulated dataset structure (`binance`, `okx`, etc.).
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔗 APIs and Libraries Used
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📡 APIs / Data Feed
 
-## Deploy on Vercel
+- `useOrderbookFeed.ts`: Simulated or real-time orderbook data, structured as:
+  ```ts
+  {
+    price: number,
+    volume: number,
+    side: 'bid' | 'ask',
+    venue: string
+  }
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
